@@ -8,6 +8,9 @@ import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
 import HealthRatingBar from "../components/HealthRatingBar";
 import { useStateValue } from "../state";
+import { useHistory } from "react-router-dom";
+
+
 
 const PatientListPage: React.FC = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -20,6 +23,11 @@ const PatientListPage: React.FC = () => {
   const closeModal = (): void => {
     setModalOpen(false);
     setError(undefined);
+  };
+
+  const history = useHistory();
+  const navigateTo = (to: string): void => {
+    history.push(to);
   };
 
   const submitNewPatient = async (values: PatientFormValues) => {
@@ -41,7 +49,7 @@ const PatientListPage: React.FC = () => {
       <Container textAlign="center">
         <h3>Patient list</h3>
       </Container>
-      <Table celled>
+      <Table celled selectable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>
@@ -52,7 +60,7 @@ const PatientListPage: React.FC = () => {
         </Table.Header>
         <Table.Body>
           {Object.values(patients).map((patient: Patient) => (
-            <Table.Row key={patient.id}>
+            <Table.Row key={patient.id} onClick={() => navigateTo(`/patients/${patient.id}`)}>
               <Table.Cell>{patient.name}</Table.Cell>
               <Table.Cell>{patient.gender}</Table.Cell>
               <Table.Cell>{patient.occupation}</Table.Cell>
@@ -70,7 +78,7 @@ const PatientListPage: React.FC = () => {
         onClose={closeModal}
       />
       <Button onClick={() => openModal()}>Add New Patient</Button>
-    </div>
+    </div >
   );
 };
 

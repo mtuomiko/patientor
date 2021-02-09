@@ -49,7 +49,6 @@ const App: React.FC = () => {
           </Button>
           <Divider hidden />
           <Switch>
-            {/* <Route exact path="/" render={() => <PatientListPage />} /> */}
             <Route exact path="/">
               <PatientListPage />
             </Route>

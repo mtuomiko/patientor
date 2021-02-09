@@ -40,7 +40,7 @@ const PatientListPage: React.FC = () => {
       closeModal();
     } catch (e) {
       console.error(e.response.data);
-      setError(e.response.data.error);
+      setError(e.response.data);
     }
   };
 
@@ -65,7 +65,7 @@ const PatientListPage: React.FC = () => {
               <Table.Cell>{patient.gender}</Table.Cell>
               <Table.Cell>{patient.occupation}</Table.Cell>
               <Table.Cell>
-                <HealthRatingBar showText={false} rating={1} />
+                <HealthRatingBar showText={true} rating={1} />
               </Table.Cell>
             </Table.Row>
           ))}

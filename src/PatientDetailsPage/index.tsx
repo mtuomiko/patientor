@@ -1,17 +1,62 @@
 import React from "react";
 import axios from "axios";
-import { Message, Icon } from 'semantic-ui-react';
+import { Message, Icon, Button } from 'semantic-ui-react';
 
 import { Patient, Gender, Entry, HospitalEntry, Diagnosis, OccupationalHealthcareEntry, HealthCheckEntry } from "../types";
 import { apiBaseUrl } from "../constants";
 import { useStateValue, addPatient } from "../state";
 import { useParams } from "react-router-dom";
+import AddEntryModal from "../AddEntryModal";
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
+import HealthRatingBar from "../components/HealthRatingBar";
 
 const PatientDetailsPage: React.FC = () => {
   const [{ patients, diagnoses }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
 
   const patient = patients[id];
+
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | undefined>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    // If type OccupationalHealthcare remove extra properties before sending
+    const { ...finalValues } = values;
+    if (finalValues.type === "OccupationalHealthcare") {
+      if (!finalValues.includeSickLeave) {
+        delete finalValues.sickLeave;
+      }
+      delete finalValues.includeSickLeave;
+    }
+
+    console.log('sending values...');
+    console.log(finalValues);
+    try {
+      const { data: newEntry } = await axios.post<Entry>(
+        `${apiBaseUrl}/patients/${patient.id}/entries`,
+        finalValues
+      );
+      const modifiedPatient = {
+        ...patient,
+        entries: [
+          ...patient.entries,
+          newEntry,
+        ],
+      };
+      dispatch(addPatient(modifiedPatient));
+      closeModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data);
+    }
+  };
 
   React.useEffect(() => {
     if (!patient || !Object.prototype.hasOwnProperty.call(patient, 'ssn')) {
@@ -47,7 +92,7 @@ const PatientDetailsPage: React.FC = () => {
     }
     return (
       <div>
-        <h2>entries</h2>
+        <h2>Entries</h2>
         {patient.entries.map(e => (
           <EntryDetails key={e.id} entry={e} />
         ))}
@@ -112,6 +157,7 @@ const PatientDetailsPage: React.FC = () => {
       <Message.Content>
         <Message.Header><Icon name="doctor" /> {entry.date}</Message.Header>
         <p>{entry.description}</p>
+        <HealthRatingBar showText={true} rating={entry.healthCheckRating} />
       </Message.Content>
       {entry.diagnosisCodes && <EntryDiagnoses diagnosisCodes={entry.diagnosisCodes} />}
     </Message>
@@ -123,11 +169,18 @@ const PatientDetailsPage: React.FC = () => {
   return (
     <div>
       <h1>{patient.name} <GenderIcon gender={patient.gender} /></h1>
-      <p>ssn: {patient?.ssn}</p>
-      <p>occupation: {patient.occupation}</p>
-      {patient.dateOfBirth && <p>date of birth: {patient.dateOfBirth}</p>}
+      <p>SSN: {patient?.ssn}</p>
+      <p>Occupation: {patient.occupation}</p>
+      {patient.dateOfBirth && <p>Date of birth: {patient.dateOfBirth}</p>}
 
       <Entries entries={patient.entries} />
+      <AddEntryModal
+        modalOpen={modalOpen}
+        onSubmit={submitNewEntry}
+        error={error}
+        onClose={closeModal}
+      />
+      <Button onClick={() => openModal()}>Add New Entry</Button>
     </div>
   );
 };

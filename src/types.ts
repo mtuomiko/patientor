@@ -20,7 +20,7 @@ export interface Patient {
   entries: Entry[];
 }
 
-interface BaseEntry {
+export interface BaseEntry {
   id: string;
   description: string;
   date: string;
@@ -45,7 +45,7 @@ export interface OccupationalHealthcareEntry extends BaseEntry {
   };
 }
 
-export enum healthCheckRating {
+export enum HealthCheckRating {
   "Healthy" = 0,
   "LowRisk" = 1,
   "HighRisk" = 2,
@@ -54,10 +54,36 @@ export enum healthCheckRating {
 
 export interface HealthCheckEntry extends BaseEntry {
   type: "HealthCheck";
-  healthCheckRating: healthCheckRating;
+  healthCheckRating: HealthCheckRating;
 }
 
 export type Entry =
   HospitalEntry
   | OccupationalHealthcareEntry
   | HealthCheckEntry;
+
+// Distributive Omit https://stackoverflow.com/a/57103940
+export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
+  ? Omit<T, K>
+  : never;
+
+/*
+  Trial code
+*/
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// export type DistributiveOverride<T, K extends PropertyKey> = T extends any
+//   ? Omit<T, K> & {
+//     K: "Hospital"
+//     | "OccupationalHealthcare"
+//     | "HealthCheck"
+//     | undefined;
+//   }
+//   : never;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// export type DistributiveTypeOverride<T> = { type: any } extends T
+//   ? Omit<T, "type"> & {
+//     type: FormEntryTypes;
+//   }
+//   : T;

@@ -18,7 +18,8 @@
     "noEmit": true,
     "jsx": "react",
     "downlevelIteration": true,
-    "allowJs": true
+    "allowJs": true,
+    "noErrorTruncation": true
   },
   "include": [
     "src"

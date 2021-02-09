@@ -1,3 +1,11 @@
+# Full Stack Open Patientor frontend exercise
+
+This repository contains the Patientor frontend used in the exercises of part 9 in the MOOC [Full Stack Open](https://fullstackopen.com/) 2020 course. Course material is provided by Helsinki University, Department of Computer Science.
+
+The corresponding patientor-backend can be found inside my Full Stack Open exercise repository: [patientor-backend](https://github.com/mtuomiko/full-stack-open/tree/master/part9/patientor-backend).
+
+---
+
 # Patientor - frontend
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
